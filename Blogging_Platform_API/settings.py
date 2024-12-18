@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'accounts',
+    'blog',
     'rest_framework',
 ]
 
@@ -52,6 +53,7 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'Blogging_Platform_API.urls'
+
 AUTH_USER_MODEL = 'accounts.CustomUser'
 
 TEMPLATES = [
