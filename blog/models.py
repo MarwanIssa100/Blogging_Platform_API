@@ -9,3 +9,18 @@ class Blog(models.Model):
     Author = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     Published_Date = models.DateTimeField(auto_now_add=False , null=True)
     Created_Date = models.DateTimeField(auto_now_add=True)
+    Category = models.ForeignKey('Category', on_delete=models.SET_NULL, null=True)
+    tags = models.ManyToManyField('Tag', related_name='blogs')
+    
+
+class Tag(models.Model):
+    name = models.CharField(max_length=100)
+    # blog = models.ManyToManyField('Blog', related_name='tags')
+    
+    def __str__(self):
+        return self.name
+
+    
+class Category(models.Model):
+    name = models.CharField(max_length=100)
+    

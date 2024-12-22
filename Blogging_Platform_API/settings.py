@@ -27,7 +27,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
-
+LOGOUT_REDIRECT_URL = 'api/login/'
 # Application definition
 
 INSTALLED_APPS = [

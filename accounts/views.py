@@ -1,11 +1,10 @@
-from django.shortcuts import render
 from rest_framework.views import  APIView
 from .serializers import UserRegistrationSerializer, UserLoginSerializer , UserSerializer
 from .models import CustomUser
 from rest_framework.exceptions import NotFound 
 from rest_framework.response import Response
-from rest_framework import status
 from rest_framework.permissions import AllowAny , IsAdminUser , IsAuthenticated
+from django.contrib.auth import logout
 # Create your views here.
 
 # The `UserRegistrationView` class is an API view in Python that handles user registration requests
@@ -56,3 +55,9 @@ class UserProfileUpdateView(APIView):
             serializer.save()
             return Response(serializer.data, status=200)
         return Response(serializer.errors, status=400)
+    
+class UserLogoutView(APIView):
+    permission_classes = [IsAuthenticated]
+    def post(self, request, *args, **kwargs):
+        logout(request)
+        return Response(status=200)

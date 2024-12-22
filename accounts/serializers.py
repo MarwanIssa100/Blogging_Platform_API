@@ -6,13 +6,6 @@ class UserSerializer(serializers.ModelSerializer):
         model = CustomUser
         fields = ['username', 'email', 'bio', 'profile_pic']
         
-    def update(self, instance, validated_data):
-        instance.username = validated_data.get('username', instance.username)
-        instance.email = validated_data.get('email', instance.email)
-        instance.bio = validated_data.get('bio', instance.bio)
-        instance.profile_pic = validated_data.get('profile_pic', instance.profile_pic)
-        instance.save()
-        return instance
 
 class UserRegistrationSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
