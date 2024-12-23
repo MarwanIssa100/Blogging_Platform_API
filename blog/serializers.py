@@ -47,6 +47,22 @@ class BlogSerializer(serializers.ModelSerializer):
 
         return blog
     
+    def update(self, instance, validated_data):
+        tags_names = validated_data.pop('tags', [])
+        category_data = validated_data.pop('Category', None)
+        
+        if category_data:
+            category, _ = Category.objects.get_or_create(**category_data)
+            validated_data['Category'] = category
+
+        blog = super().update(instance, validated_data)
+        
+        for tag_name in tags_names:
+            tag, created = Tag.objects.get_or_create(name=tag_name)  # Use or create tags
+            blog.tags.add(tag)
+            
+        return blog
+    
     def to_representation(self, instance):
         # Override to_representation to display tag names instead of IDs
         representation = super().to_representation(instance)

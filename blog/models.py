@@ -15,7 +15,6 @@ class Blog(models.Model):
 
 class Tag(models.Model):
     name = models.CharField(max_length=100)
-    # blog = models.ManyToManyField('Blog', related_name='tags')
     
     def __str__(self):
         return self.name
