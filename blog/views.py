@@ -1,6 +1,6 @@
 from rest_framework.views import  APIView
-from .serializers import BlogSerializer , TagSerializer , CategorySerializer
-from .models import Blog 
+from .serializers import BlogSerializer , CategorySerializer , TagSerializer
+from .models import Blog , Category , Tag
 from rest_framework.response import Response
 from rest_framework.permissions import IsAdminUser
 from django.db.models import Q
@@ -44,6 +44,12 @@ class TagCreationView(APIView):
             serializer.save()
             return Response(serializer.data, status=201)
         return Response(serializer.errors, status=400)
+
+class TagDeleteView(APIView):
+    def delete(self, request, *args, **kwargs):
+        tag = Tag.objects.get(id=kwargs['id'])
+        tag.delete()
+        return Response(status=204)
     
 class CategoryCreationView(APIView):
     permission_classes = [IsAdminUser]

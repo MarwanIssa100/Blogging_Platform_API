@@ -1,7 +1,15 @@
+from symtable import Class
 from django.db import models
 from accounts.models import CustomUser
 # Create your models here.
 
+
+class Tag(models.Model):
+    name = models.CharField(max_length=100, unique=True , default="")
+    
+    def __str__(self):
+        return f'Tag[id: {self.id}, name: {self.name}]'
+    
 
 class Blog(models.Model):
     Title = models.CharField(max_length=100)
@@ -10,14 +18,8 @@ class Blog(models.Model):
     Published_Date = models.DateTimeField(auto_now_add=False , null=True)
     Created_Date = models.DateTimeField(auto_now_add=True)
     Category = models.ForeignKey('Category', on_delete=models.SET_NULL, null=True)
-    tags = models.ManyToManyField('Tag', related_name='blogs')
-    
+    tags = models.ManyToManyField('Tag', related_name='blogs', blank=True)    
 
-class Tag(models.Model):
-    name = models.CharField(max_length=100)
-    
-    def __str__(self):
-        return self.name
 
     
 class Category(models.Model):

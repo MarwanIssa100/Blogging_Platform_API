@@ -1,7 +1,7 @@
 from rest_framework import serializers
-from .models import Blog , Tag , Category
+from .models import Blog , Category , Tag
 
-class TagSerializer(serializers.ModelSerializer):
+class TagSerializer(serializers.ListField):
     class Meta:
         model = Tag
         fields = ['name']
@@ -10,6 +10,9 @@ class TagSerializer(serializers.ModelSerializer):
         instance = self.Meta.model
         tag = instance.objects.create(**validated_data)
         return tag
+    
+    def to_representation(self, data):
+        return data.values_list('name', flat=True)
     
     
 class CategorySerializer(serializers.ModelSerializer):
@@ -22,50 +25,49 @@ class CategorySerializer(serializers.ModelSerializer):
         return category    
 
 class BlogSerializer(serializers.ModelSerializer):
-    tags = serializers.PrimaryKeyRelatedField(many=True, queryset=Tag.objects.all())
-    Category = CategorySerializer(many=False,required=False)
+    tags = TagSerializer(required=False)
     class Meta:
         model = Blog
-        fields = ['Title', 'Content', 'Author' , 'Category', 'tags']
+        fields = ['Title', 'Content', 'Author' , 'Category','tags']
         
         
         
     def create(self, validated_data):
-        tags_names = validated_data.pop('tags', [])
-        category_data = validated_data.pop('Category', None)
-        
-        if category_data:
-            category, _ = Category.objects.get_or_create(**category_data)
-            validated_data['Category'] = category
+        tag_names = validated_data.pop('tags',[])if "tags" in validated_data else []
+
 
         blog = self.Meta.model.objects.create(**validated_data)
-            
-        for tag_name in tags_names:
-            tag, created = Tag.objects.get_or_create(name=tag_name)  # Use or create tags
-            blog.tags.add(tag)
-            
+        
+        if tag_names:
+            tags = []
+            for name in tag_names:
+                tag, _ = Tag.objects.get_or_create(name=name)
+                tags.append(tag)
+                
+            blog.tags.set(tags)
+        
 
         return blog
     
     def update(self, instance, validated_data):
-        tags_names = validated_data.pop('tags', [])
-        category_data = validated_data.pop('Category', None)
-        
-        if category_data:
-            category, _ = Category.objects.get_or_create(**category_data)
-            validated_data['Category'] = category
+        tag_names = validated_data.pop('tags', []) if "tags" in validated_data else []
+
 
         blog = super().update(instance, validated_data)
         
-        for tag_name in tags_names:
-            tag, created = Tag.objects.get_or_create(name=tag_name)  # Use or create tags
-            blog.tags.add(tag)
+        if tag_names:
+            tags = []
+            for name in tag_names:
+                tag, _ = Tag.objects.get_or_create(name=name)
+                tags.append(tag)
+                
+            blog.tags.set(tags)
+        
             
         return blog
     
     def to_representation(self, instance):
         # Override to_representation to display tag names instead of IDs
         representation = super().to_representation(instance)
-        representation['tags'] = TagSerializer(instance.tags.all(), many=True).data
         representation['Category'] = CategorySerializer(instance.Category).data if instance.Category else None
         return representation

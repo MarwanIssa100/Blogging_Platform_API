@@ -56,6 +56,7 @@ ROOT_URLCONF = 'Blogging_Platform_API.urls'
 
 AUTH_USER_MODEL = 'accounts.CustomUser'
 
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
