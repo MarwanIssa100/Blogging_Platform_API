@@ -1,5 +1,7 @@
 from rest_framework import serializers
 from .models import Blog , Category , Tag
+from django.utils.timezone import now
+from datetime import datetime
 
 class TagSerializer(serializers.ListField):
     class Meta:
@@ -14,6 +16,8 @@ class TagSerializer(serializers.ListField):
     def to_representation(self, data):
         return data.values_list('name', flat=True)
     
+
+    
     
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
@@ -26,17 +30,34 @@ class CategorySerializer(serializers.ModelSerializer):
 
 class BlogSerializer(serializers.ModelSerializer):
     tags = TagSerializer(required=False)
+    publish_now = serializers.BooleanField(required=False,write_only=True,default=False)
+    Published_Date = serializers.SerializerMethodField()
     class Meta:
         model = Blog
-        fields = ['Title', 'Content', 'Author' , 'Category','tags']
+        fields = ['Title', 'Content', 'Author' , 'Category','tags', 'Published_Date','publish_now']
+        
+        
+    def get_Published_Date(self, obj):
+        if obj.Published_Date:
+            return obj.Published_Date.strftime("%d-%m-%Y %H:%M:%S")
+        else:
+            return None
         
         
         
     def create(self, validated_data):
         tag_names = validated_data.pop('tags',[])if "tags" in validated_data else []
-
-
+        publish_now = validated_data.pop('publish_now', False)
+        
+        if publish_now:
+            validated_data['Published_Date'] = now()
+        else:
+            validated_data['Published_Date'] = None
+        
         blog = self.Meta.model.objects.create(**validated_data)
+        
+
+            
         
         if tag_names:
             tags = []
@@ -51,6 +72,12 @@ class BlogSerializer(serializers.ModelSerializer):
     
     def update(self, instance, validated_data):
         tag_names = validated_data.pop('tags', []) if "tags" in validated_data else []
+        publish_now = validated_data.pop('publish_now', False)
+        
+        if publish_now:
+            validated_data['Published_Date'] = now()
+        else:
+            validated_data['Published_Date'] = None
 
 
         blog = super().update(instance, validated_data)

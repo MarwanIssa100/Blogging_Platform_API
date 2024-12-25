@@ -1,6 +1,6 @@
-from symtable import Class
 from django.db import models
 from accounts.models import CustomUser
+from django.utils import timezone
 # Create your models here.
 
 
@@ -18,7 +18,7 @@ class Blog(models.Model):
     Published_Date = models.DateTimeField(auto_now_add=False , null=True)
     Created_Date = models.DateTimeField(auto_now_add=True)
     Category = models.ForeignKey('Category', on_delete=models.SET_NULL, null=True)
-    tags = models.ManyToManyField('Tag', related_name='blogs', blank=True)    
+    tags = models.ManyToManyField('Tag', related_name='blogs', blank=True)  
 
 
     

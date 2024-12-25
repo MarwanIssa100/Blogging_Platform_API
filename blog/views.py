@@ -1,10 +1,11 @@
 from rest_framework.views import  APIView
 from .serializers import BlogSerializer , CategorySerializer , TagSerializer
-from .models import Blog , Category , Tag
+from .models import Blog, Tag
 from rest_framework.response import Response
 from rest_framework.permissions import IsAdminUser
 from django.db.models import Q
-from rest_framework.generics import GenericAPIView
+from .pagination import BlogPagination
+from rest_framework.filters import OrderingFilter
 # Create your views here.
 
 class BlogCreationView(APIView):
@@ -20,6 +21,24 @@ class BlogDetailsView(APIView):
     def get(self, request, *args, **kwargs):
         blog = Blog.objects.get(id=kwargs['id'])
         serializer = BlogSerializer(blog)
+        return Response(serializer.data, status=200)
+    
+class BlogListView(APIView):
+    pagination_class = BlogPagination
+    filter_backends = [OrderingFilter]
+    ordering_fields = ['Published_Date','Category']
+    
+    def get(self, request, *args, **kwargs):
+        blogs = Blog.objects.filter(Published_Date__isnull=False).all()
+        paginator =  self.pagination_class()
+        sort_by = request.query_params.get('sort','')
+        if sort_by:
+            blogs = blogs.order_by(sort_by)
+        page = paginator.paginate_queryset(blogs, request, view=self)
+        if page is not None:
+            serializer = BlogSerializer(page, many=True)
+            return paginator.get_paginated_response(serializer.data)
+        serializer = BlogSerializer(blogs, many=True)
         return Response(serializer.data, status=200)
     
 class BlogUpdateView(APIView):
