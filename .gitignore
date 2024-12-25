@@ -6,3 +6,6 @@ db.sqlite3
 
 #migrations
 **/migrations/
+# Ignore migrations and pycache directories
+**/migrations/
+**/__pycache__/
