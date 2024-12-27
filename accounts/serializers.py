@@ -1,5 +1,8 @@
 from rest_framework import serializers
 from .models import CustomUser
+from rest_framework.authtoken.models import Token
+from django.contrib.auth import authenticate
+
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -26,10 +29,22 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
 class UserLoginSerializer(serializers.Serializer):
     username = serializers.CharField()
     password = serializers.CharField(write_only=True)
+    token = serializers.CharField(read_only=True)
     
     def validate(self, data):
-        user = CustomUser.objects.filter(username=data['username']).first()
-        if not user:
-            raise serializers.ValidationError('User not found')
-        return data
-    
+        username = data.get('username')
+        password = data.get('password')
+        
+        if username and password:
+            user = authenticate(username=username, password=password)
+            if not user:
+                raise serializers.ValidationError('Invalid username or password.')
+            if not user.is_active:
+                raise serializers.ValidationError('User account is disabled.')
+            
+            token, created = Token.objects.get_or_create(user=user)
+            data['token'] = token.key
+            data['user'] = user
+            return data
+        else:
+            raise serializers.ValidationError('Must provide both username and password.')

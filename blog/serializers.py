@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from .models import Blog , Category , Tag
 from django.utils.timezone import now
-from datetime import datetime
+
 
 class TagSerializer(serializers.ListField):
     class Meta:

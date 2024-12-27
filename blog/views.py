@@ -2,11 +2,17 @@ from rest_framework.views import  APIView
 from .serializers import BlogSerializer , CategorySerializer , TagSerializer
 from .models import Blog, Tag
 from rest_framework.response import Response
-from rest_framework.permissions import IsAdminUser
+from rest_framework.permissions import IsAdminUser , BasePermission
 from django.db.models import Q
 from .pagination import BlogPagination
 from rest_framework.filters import OrderingFilter
+from rest_framework.authentication import TokenAuthentication
+from rest_framework.exceptions import NotFound
 # Create your views here.
+
+class IsOwner(BasePermission):
+    def has_object_permission(self, request, view, obj):
+        return obj.Author == request.user
 
 class BlogCreationView(APIView):
     def post(self, request, *args, **kwargs):
@@ -42,8 +48,18 @@ class BlogListView(APIView):
         return Response(serializer.data, status=200)
     
 class BlogUpdateView(APIView):
+    permission_classes = [IsOwner]
+    
+    def get_object(self, id):
+        try:
+            obj = Blog.objects.get(id=id)
+            self.check_object_permissions(self.request, obj)
+            return obj
+        except Blog.DoesNotExist:
+            raise NotFound("Blog not found")
+        
     def put(self, request, *args, **kwargs):
-        blog = Blog.objects.get(id=kwargs['id'])
+        blog = self.get_object(kwargs['id'])
         serializer = BlogSerializer(blog, partial=True, data=request.data)
         if serializer.is_valid():
             serializer.save()
@@ -51,8 +67,19 @@ class BlogUpdateView(APIView):
         return Response(serializer.errors, status=400)
     
 class BlogDeleteView(APIView):
+    permission_classes = [IsOwner | IsAdminUser]
+    authentication_classes = [TokenAuthentication]
+
+    def get_object(self, id):
+        try:
+            obj = Blog.objects.get(id=id)
+            self.check_object_permissions(self.request, obj)
+            return obj
+        except Blog.DoesNotExist:
+            raise NotFound("Blog not found")
+
     def delete(self, request, *args, **kwargs):
-        blog = Blog.objects.get(id=kwargs['id'])
+        blog = self.get_object(kwargs['id'])
         blog.delete()
         return Response(status=204)
     
