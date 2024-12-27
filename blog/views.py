@@ -82,14 +82,6 @@ class BlogDeleteView(APIView):
         blog = self.get_object(kwargs['id'])
         blog.delete()
         return Response(status=204)
-    
-class TagCreationView(APIView):
-    def post(self, request, *args, **kwargs):
-        serializer = TagSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=201)
-        return Response(serializer.errors, status=400)
 
 class TagDeleteView(APIView):
     def delete(self, request, *args, **kwargs):
