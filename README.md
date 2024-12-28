@@ -106,3 +106,25 @@
   - **Response:**
     - **204 No Content:** Blog deleted successfully
     - **404 Not Found:** Blog not found
+
+**Delete Tags**
+  - **Endpoint:** `/api/tag/delete/{id}/`
+  - **Method:** `DELETE`
+  - **Response:**
+    - **204 No Content:** Tag deleted successfully
+    - **404 Not Found:** Tag not found
+
+    **Create Category**
+  - **Endpoint:** `/api/category/create/`
+  - **Method:** `POST`
+  - **Request Body:**
+  ```json
+  {
+    "name": "string"
+  }
+  ```
+    - **Headers:** 
+    - `Authentication: you'er not admin`
+  - **Response:**
+    - **201 Created:** Category successfully created
+    - **400 Bad Request:** Validation errors

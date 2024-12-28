@@ -26,7 +26,6 @@ class UserRegistrationView(APIView):
 # for any user.
 class UserLoginView(APIView):
     permission_classes = [AllowAny]
-    # authentication_classes = [TokenAuthentication]
     def post(self, request, *args, **kwargs):
         serializer = UserLoginSerializer(data=request.data)
         if serializer.is_valid():
@@ -72,7 +71,6 @@ class UserLogoutView(APIView):
         
         # Update user's is_active status
         user = request.user
-        user.is_active = False
         user.save()
         
         # Perform Django logout
