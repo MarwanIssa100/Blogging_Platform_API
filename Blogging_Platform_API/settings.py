@@ -28,6 +28,8 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
+X_FRAME_OPTIONS = 'SAMEORIGIN' 
+
 LOGOUT_REDIRECT_URL = 'api/login/'
 # Application definition
 
@@ -43,6 +45,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'django_filters',
     'rest_framework.authtoken',
+    'mdeditor',
 ]
 
 MIDDLEWARE = [
@@ -58,6 +61,12 @@ MIDDLEWARE = [
 ROOT_URLCONF = 'Blogging_Platform_API.urls'
 
 AUTH_USER_MODEL = 'accounts.CustomUser'
+
+MDEDITOR_CONFIGS = {
+    'default' : {
+        'language': 'en',
+    }
+}
 
 
 TEMPLATES = [

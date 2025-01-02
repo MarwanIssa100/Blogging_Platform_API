@@ -1,6 +1,7 @@
 from django.db import models
 from accounts.models import CustomUser
 from django.utils import timezone
+from mdeditor.fields import MDTextField
 # Create your models here.
 
 
@@ -13,7 +14,8 @@ class Tag(models.Model):
 
 class Blog(models.Model):
     Title = models.CharField(max_length=100)
-    Content = models.TextField()
+    # Content = models.TextField()
+    Content = MDTextField()
     Author = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     Published_Date = models.DateTimeField(auto_now_add=False , null=True)
     Created_Date = models.DateTimeField(auto_now_add=True)
